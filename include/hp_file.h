@@ -7,7 +7,7 @@
 /* Η δομή HP_info κρατάει μεταδεδομένα που σχετίζονται με το αρχείο σωρού*/
 typedef struct {
     // Να το συμπληρώσετε
-    char file_type;
+    //char file_type;
     int file_desc;
     int last_block_id;
     int num_o_blocks;
