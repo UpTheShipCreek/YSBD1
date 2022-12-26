@@ -3,15 +3,25 @@
 #include <record.h>
 
 
+typedef enum HP_ErrorCode {
+  HP_ERROR, 
+  HP_OK
+} HP_ErrorCode;
 
 /* Η δομή HP_info κρατάει μεταδεδομένα που σχετίζονται με το αρχείο σωρού*/
 typedef struct {
     // Να το συμπληρώσετε
-    //char file_type;
     int file_desc;
-    int last_block_id;
-    int num_o_blocks;
+    int blocks_index;
+    int last_block_index;
+    int max_records;
 } HP_info;
+
+//Block's metadata
+typedef struct {
+    int* next_block;
+    int num_o_records;
+} HP_block_info;
 
 /*Η συνάρτηση HP_CreateFile χρησιμοποιείται για τη δημιουργία και
 κατάλληλη αρχικοποίηση ενός άδειου αρχείου σωρού με όνομα fileName.
