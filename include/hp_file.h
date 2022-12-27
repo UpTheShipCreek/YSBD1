@@ -12,14 +12,13 @@ typedef enum HP_ErrorCode {
 typedef struct {
     // Να το συμπληρώσετε
     int file_desc;
-    int blocks_index;
     int last_block_index;
-    int max_records;
+    int max_records; //that's here just because I had some issue with the #define
 } HP_info;
 
 //Block's metadata
 typedef struct {
-    int* next_block;
+    int* next_block; //useless
     int num_o_records;
 } HP_block_info;
 
