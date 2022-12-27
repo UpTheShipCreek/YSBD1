@@ -98,50 +98,50 @@ int HT_InsertEntry(HT_info* ht_info, Record record){
   void* data;
   int block_id;
   int block_info_margin = ht_info->max_records*sizeof(Record);
-  printf("%d Loading block zero\n", __LINE__);
+  //printf("%d Loading block zero\n", __LINE__);
   BF_Block* block0;
   BF_Block_Init(&block0);
   CALL_OR_DIE(BF_GetBlock(ht_info->file_desc,0,block0));
-  printf("%d Getting metadata\n", __LINE__);
+  //printf("%d Getting metadata\n", __LINE__);
   void* d = BF_Block_GetData(block0);
   // HT_info* info = d; 
-  printf("%d Get data\n", __LINE__);
+  //printf("%d Get data\n", __LINE__);
 
   int bucket = hash(record.id,ht_info);
   block_id = ht_info->hashtable[bucket]; //find the block for the specific id
-  printf("%d Block %d for bucket %d\n", __LINE__, block_id, bucket);
+  //printf("%d Block %d for bucket %d\n", __LINE__, block_id, bucket);
 
   BF_Block* block;
   BF_Block_Init(&block);
   CALL_OR_DIE(BF_GetBlock(ht_info->file_desc,block_id,block));
-  printf("%d Loaded block X in memory\n", __LINE__);
+  //printf("%d Loaded block X in memory\n", __LINE__);
 
   data = BF_Block_GetData(block);
   HT_block_info* block_info = data + block_info_margin;
-  printf("%d Got block's metadata\n", __LINE__);
+  //printf("%d Got block's metadata\n", __LINE__);
 
   if(block_info->num_o_records < ht_info->max_records){
     int margin = block_info->num_o_records*sizeof(Record); 
     memcpy(data+margin, &record, sizeof(Record));
-    printf("%d Block has enoough space, copied record into block\n", __LINE__);
+    //printf("%d Block has enoough space, copied record into block\n", __LINE__);
 
     block_info->num_o_records++;
     BF_Block_SetDirty(block);
     CALL_OR_DIE(BF_UnpinBlock(block));
     BF_Block_Destroy(&block);
-    printf("%d Destroyed block X, exiting\n", __LINE__);
+    //printf("%d Destroyed block X, exiting\n", __LINE__);
   }
   else{
     int new_block_id;
     CALL_OR_DIE(BF_UnpinBlock(block));
     BF_Block_Destroy(&block);
-    printf("%d Not enough space, destroyed block X\n", __LINE__);
+    //printf("%d Not enough space, destroyed block X\n", __LINE__);
 
     BF_Block* new_block;
     BF_Block_Init(&new_block);
     CALL_OR_DIE(BF_AllocateBlock(ht_info->file_desc, new_block)); //allocate new block
     CALL_OR_DIE(BF_GetBlockCounter(ht_info->file_desc,&new_block_id));
-    printf("%d Allocated new block Y\n", __LINE__);
+    //printf("%d Allocated new block Y\n", __LINE__);
 
     void* new_data = BF_Block_GetData(new_block);
     HT_block_info* new_block_info = new_data + block_info_margin; 
@@ -150,7 +150,7 @@ int HT_InsertEntry(HT_info* ht_info, Record record){
     new_block_info->num_o_records=1;
     new_block_info->bucket = bucket;
     new_block_info->previous_block = block_id; // so we must somewhere save the previous block as well
-    printf("%d Copied the record and updated block's Y metadata\n", __LINE__);
+    //printf("%d Copied the record and updated block's Y metadata\n", __LINE__);
     //the bucket now must try and fill the new block 
     ht_info->hashtable[bucket] = new_block_id-1;  //we subtract one because the block's id is one less than the number of blocks             
     ht_info->num_o_blocks++; //increment the number of blocks
@@ -158,14 +158,14 @@ int HT_InsertEntry(HT_info* ht_info, Record record){
     BF_Block_SetDirty(new_block);
     CALL_OR_DIE(BF_UnpinBlock(new_block));
     BF_Block_Destroy(&new_block);
-    printf("%d Updated files metadata and destroyed block Y\n", __LINE__);
+    //printf("%d Updated files metadata and destroyed block Y\n", __LINE__);
   } 
 
   memcpy(d,ht_info,sizeof(HT_info)); //update the internal ht_info structure with the resolution of the operation(The opposite was better for the heap since I didn't need to play with memory in between calls in the equivelent function)
   BF_Block_SetDirty(block0);
   CALL_OR_DIE(BF_UnpinBlock(block0));
   BF_Block_Destroy(&block0);
-  printf("%d Destroyed block zero, we are done here\n", __LINE__);
+  //printf("%d Destroyed block zero, we are done here\n", __LINE__);
 
   return 0;
 }
@@ -176,38 +176,38 @@ int HT_GetAllEntries(HT_info* ht_info, void *value ){
   int i, j,block_number;
   
 
-  //printf("\n%d Last Block index: %d\n",__LINE__, ht_info->last_block_index);
+  ////printf("\n%d Last Block index: %d\n",__LINE__, ht_info->last_block_index);
 
   for(i = 1; i < ht_info->num_o_blocks; i++){ //for every block that is not the first one 
-    //printf("%d\n", __LINE__);
+    ////printf("%d\n", __LINE__);
 
     BF_Block* block;
     BF_Block_Init(&block);
     CALL_OR_DIE(BF_GetBlock(ht_info->file_desc,i,block));
 
-    //printf("%d\n", __LINE__);
+    ////printf("%d\n", __LINE__);
     void* data = BF_Block_GetData(block);
     HT_block_info* block_info = data + block_info_margin; //getting the block's metadata the good ol' way
 
-    //printf("%d Number of records: %d\n",__LINE__, block_info->num_o_records);
+    ////printf("%d Number of records: %d\n",__LINE__, block_info->num_o_records);
   
     for(j = 0; j < block_info->num_o_records; j++){ //and for every record in this block
-      //printf("%d\n", __LINE__);
+      ////printf("%d\n", __LINE__);
       Record* record = data + j*sizeof(Record); //get the record
       if(record->id == *(int*)value){ //and check if it has the Id we want
-        //printf("%d\n", __LINE__);
+        ////printf("%d\n", __LINE__);
         found = true; // we are setting over and over but it's okay, it is just a boolean
         block_number = i; //the block number we need to update of course
-        //printf("Id: %d\n Name: %s\n Surname: %s\n City: %s\n", record->id,record->name,record->surname,record->city);
+        printf("Id: %d\nName: %s\nSurname: %s\nCity: %s\n", record->id,record->name,record->surname,record->city);
       }
     }
-    //printf("%d\n", __LINE__);
+    ////printf("%d\n", __LINE__);
     CALL_OR_DIE(BF_UnpinBlock(block));
     BF_Block_Destroy(&block);
   }
   
   if(found){
-    //printf("%d\n", __LINE__);
+    ////printf("%d\n", __LINE__);
     return block_number;
   }
   else return -1;

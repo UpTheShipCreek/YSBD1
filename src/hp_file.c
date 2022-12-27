@@ -219,11 +219,12 @@ int HP_GetAllEntries(HP_info* hp_info, int value){
     for(j = 0; j < block_info->num_o_records; j++){ //and for every record in this block
       //printf("%d\n", __LINE__);
       Record* record = data + j*sizeof(Record); //get the record
+      //printf("%d Record id is %d\n", __LINE__,record->id);
       if(record->id == value){ //and check if it has the Id we want
-        //printf("%d\n", __LINE__);
+        //printf("%d %d == %d\n", __LINE__,record->id,value);
         found = true; // we are setting over and over but it's okay, it is just a boolean
         block_number = i; //the block number we need to update of course
-        //printf("Id: %d\n Name: %s\n Surname: %s\n City: %s\n", record->id,record->name,record->surname,record->city);
+        printf("\nId: %d\nName: %s\nSurname: %s\nCity: %s\n", record->id,record->name,record->surname,record->city);
       }
     }
     //printf("%d\n", __LINE__);
