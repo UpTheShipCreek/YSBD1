@@ -3,15 +3,29 @@
 #include <record.h>
 
 
-
+typedef enum HP_ErrorCode {
+  HP_ERROR, 
+  HP_OK
+} HP_ErrorCode;
 
 typedef struct {
     // Να το συμπληρώσετε
+    int file_desc;
+    int numBuckets;
+    int num_o_blocks;
+    int max_records; //lets put it here why not
+    int hashtable[];
 } HT_info;
 
 typedef struct {
     // Να το συμπληρώσετε
+    int num_o_records;
+    int bucket;
+    int previous_block;
 } HT_block_info;
+
+/*Our hash function*/
+int hash(int id, HT_info* header_info);
 
 /*Η συνάρτηση HT_CreateFile χρησιμοποιείται για τη δημιουργία
 και κατάλληλη αρχικοποίηση ενός άδειου αρχείου κατακερματισμού

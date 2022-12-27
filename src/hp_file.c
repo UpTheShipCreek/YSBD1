@@ -64,9 +64,9 @@ HP_info* HP_OpenFile(char *fileName){
     //printf("Error: The block is empty!\n");
     return NULL;
   }
+  memcpy(hp_info,data,sizeof(HP_info)); //copy the info from the block to the memory allocated for hp_info
   CALL_BF(BF_UnpinBlock(block));
   BF_Block_Destroy(&block);
-  memcpy(hp_info,data,sizeof(HP_info)); //copy the info from the block to the memory allocated for hp_info
   return hp_info; //need to free that someday
 }
 
@@ -139,7 +139,7 @@ int HP_InsertEntry(HP_info* hp_info, Record record){
     //printf("%d The block can take new records\n", __LINE__);
     int margin = block_info->num_o_records*sizeof(Record); 
     memcpy(data+margin, &record, sizeof(Record)); //add the new record in the correct position (I hope)
-    Record* r = data+margin;
+    //Record* r = data+margin;
     //printf("%d Added record with Id %d\n", __LINE__, r->id);
     block_info->num_o_records++; //increase the record counter
     //printf("%d New number of records is %d\n", __LINE__, block_info->num_o_records);
