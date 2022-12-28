@@ -159,6 +159,7 @@ int HT_InsertEntry(HT_info* ht_info, Record record){
     CALL_OR_DIE(BF_UnpinBlock(new_block));
     BF_Block_Destroy(&new_block);
     //printf("%d Updated files metadata and destroyed block Y\n", __LINE__);
+    block_id = new_block_id-1;
   } 
 
   memcpy(d,ht_info,sizeof(HT_info)); //update the internal ht_info structure with the resolution of the operation(The opposite was better for the heap since I didn't need to play with memory in between calls in the equivelent function)
@@ -167,7 +168,7 @@ int HT_InsertEntry(HT_info* ht_info, Record record){
   BF_Block_Destroy(&block0);
   //printf("%d Destroyed block zero, we are done here\n", __LINE__);
 
-  return 0;
+  return block_id;
 }
 
 int HT_GetAllEntries(HT_info* ht_info, void *value ){
@@ -197,6 +198,7 @@ int HT_GetAllEntries(HT_info* ht_info, void *value ){
 }
 
 bool HT_GetRecordinBlock(HT_info* ht_info, void *value, int block_id){
+  Record* record;
   int j;
   int block_info_margin = ht_info->max_records*sizeof(Record);
   bool flag = false;
@@ -208,7 +210,7 @@ bool HT_GetRecordinBlock(HT_info* ht_info, void *value, int block_id){
   HT_block_info* block_info = data + block_info_margin; //getting the block's metadata the good ol' way
 
   for(j = 0; j < block_info->num_o_records; j++){ //and for every record in this block
-    Record* record = data + j*sizeof(Record); 
+    record = data + j*sizeof(Record); 
     if(record->id == *(int*)value){ 
       flag = true;
       printf("Id: %d\nName: %s\nSurname: %s\nCity: %s\n", record->id,record->name,record->surname,record->city);

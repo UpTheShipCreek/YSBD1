@@ -4,15 +4,28 @@
 #include <ht_table.h>
 
 
+typedef struct{
+    char name[15];
+    int block;
+}Duplet;
 
 
 typedef struct {
-    // Να το συμπληρώσετε
+    int file_desc; // αναγνωριστικός αριθμός ανοίγματος αρχείου από το επίπεδο block 
+    int numBuckets; // το πλήθος των “κάδων” του αρχείου κατακερματισμού 
+    int num_o_blocks;
+    int max_duplets;
+    int hashtable[];
 } SHT_info;
 
 typedef struct {
     // Να το συμπληρώσετε
+    int num_o_duplets;
+    int overflow_block;
+    int bucket;
 } SHT_block_info;
+
+int secondary_hash(char* name, SHT_info* header_info);
 
 /*Η συνάρτηση SHT_CreateSecondaryIndex χρησιμοποιείται για τη δημιουργία
 και κατάλληλη αρχικοποίηση ενός αρχείου δευτερεύοντος κατακερματισμού με

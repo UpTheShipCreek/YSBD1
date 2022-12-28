@@ -78,6 +78,7 @@ int HP_CloseFile( HP_info* hp_info ){
 }
 
 int HP_InsertEntry(HP_info* hp_info, Record record){
+  int block_id;
 
   //printf("%d\n", __LINE__);
 
@@ -100,8 +101,8 @@ int HP_InsertEntry(HP_info* hp_info, Record record){
   BF_Block_Init(&block);
 
   //printf("%d\n", __LINE__);
-
-  if(hp_info->last_block_index == 0){ //if the index of the last block is zero it means that there is only one block and we need to allocate another one
+  block_id = hp_info->last_block_index; 
+  if(block_id == 0){ //if the index of the last block is zero it means that there is only one block and we need to allocate another one
     CALL_BF(BF_AllocateBlock(hp_info->file_desc, block));
 
     //printf("%d Allocating new block for entry\n", __LINE__);
@@ -123,6 +124,7 @@ int HP_InsertEntry(HP_info* hp_info, Record record){
     BF_Block_SetDirty(block0);
     void* nd = BF_Block_GetData(block0); //I hope this updates the hp metadata
     info = nd; //I do that in order to not mess with memcpy multiple times inside the same call itself
+    block_id = 1;
   }
   else{
     CALL_BF(BF_GetBlock(hp_info->file_desc,info->last_block_index,block));
@@ -182,6 +184,7 @@ int HP_InsertEntry(HP_info* hp_info, Record record){
     BF_Block_Destroy(&new_block);
 
     info->last_block_index++; //update the hp's metadata
+    block_id++;
   }
   memcpy(hp_info,info,sizeof(HP_info)); //update the external hp_info structure with the resolution of the operation
   //printf("%d\n", __LINE__);
@@ -192,7 +195,7 @@ int HP_InsertEntry(HP_info* hp_info, Record record){
 
   //printf("%d\n", __LINE__);
 
-  return 0;
+  return block_id;
 }
 
 int HP_GetAllEntries(HP_info* hp_info, int value){
