@@ -192,7 +192,7 @@ int SHT_SecondaryInsertEntry(SHT_info* sht_info, Record record, int block_id){
 
 int SHT_SecondaryGetAllEntries(HT_info* ht_info, SHT_info* sht_info, char* name){
   int block_info_margin = sht_info->max_duplets*sizeof(Duplet);
-  int block_counter = 0;
+  int block_counter = 1; //if we are not to return an error, we need to be able to read at least 1 block 
   int i, block_id,sblock_id;
   SHT_block_info* block_info; 
   Duplet* duplet;
@@ -209,18 +209,18 @@ int SHT_SecondaryGetAllEntries(HT_info* ht_info, SHT_info* sht_info, char* name)
   block_info = data + block_info_margin;
 
   block_id = SHT_GetMainBlock(sht_info, name, sblock_id); //getting the ID of the block in the hashtable
-  if(SHT_GetRecordinBlock(ht_info,name,block_id)) block_counter++; //fetching the full entry from the block
+  if(block_id == 0) return -1;
+  SHT_GetRecordinBlock(ht_info,name,block_id); //fetching the full entry from the block
 
   //go through all the blocks associated with the bucket
   int prev = block_info->previous_block;
   while(prev != 0){
     block_id = SHT_GetMainBlock(sht_info, name, prev); //check the main block's id
-    //the block counter doesn't count the correct thing, neither here nor on the ht_table
-    if(SHT_GetRecordinBlock(ht_info,name,block_id)) block_counter++; //get the full entry from the main database
+    SHT_GetRecordinBlock(ht_info,name,block_id);  //get the full entry from the main database
+    block_counter++; //I am only counting the main hashtable's blocks else it would be block_counter+=2 for every loop in the while
     prev--;
   } 
-  if(block_counter!=0) return block_counter; //this returns the number of blocks on which we found the name instead, if I have time'll fix this
-  else return -1;
+  return block_counter;  
 }
 
 int SHT_GetMainBlock(SHT_info* sht_info, char* name, int sblock_id){

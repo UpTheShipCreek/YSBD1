@@ -173,7 +173,7 @@ int HT_InsertEntry(HT_info* ht_info, Record record){
 
 int HT_GetAllEntries(HT_info* ht_info, void *value ){
   void* d;
-  int block_counter = 0;
+  int block_counter = 1;
   int block_info_margin = ht_info->max_records*sizeof(Record);
   int bucket = hash(*(int*)value,ht_info);
   int block_id = ht_info->hashtable[bucket];
@@ -185,16 +185,16 @@ int HT_GetAllEntries(HT_info* ht_info, void *value ){
   HT_block_info* block_info = data + block_info_margin;
 
   //hash specific search to the block and all of its overflowed instances
-  if(HT_GetRecordinBlock(ht_info, value, block_id)) block_counter++;
+  if(HT_GetRecordinBlock(ht_info, value, block_id) == false) return -1;
 
   int prev = block_info->previous_block;
   while(prev != 0){
-    if(HT_GetRecordinBlock(ht_info, value, prev)) block_counter++;
+    HT_GetRecordinBlock(ht_info, value, prev);
+    block_counter++;
     prev--;
   }
 
-  if(block_counter!=0) return block_counter;
-  else return -1;
+  return block_counter; //this returns the number of blocks of the correct bucket, which is all we need to read to make sure we've read every entry
 }
 
 bool HT_GetRecordinBlock(HT_info* ht_info, void *value, int block_id){
