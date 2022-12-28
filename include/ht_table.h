@@ -1,6 +1,7 @@
 #ifndef HT_TABLE_H
 #define HT_TABLE_H
 #include <record.h>
+#include <stdbool.h>
 
 
 typedef enum HP_ErrorCode {
@@ -71,5 +72,7 @@ int HT_InsertEntry(HT_info* header_info, /*επικεφαλίδα του αρχ�
 int HT_GetAllEntries(HT_info* header_info, /*επικεφαλίδα του αρχείου*/
 	void *value /*τιμή του πεδίου-κλειδιού προς αναζήτηση*/);
 
+//Check if a specific value is in a specific block. If yes print it and return true else return false
+bool HT_GetRecordinBlock(HT_info* ht_info, void *value, int block_id);
 
 #endif // HT_FILE_H
