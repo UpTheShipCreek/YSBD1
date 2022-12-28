@@ -122,7 +122,7 @@ int HP_InsertEntry(HP_info* hp_info, Record record){
     //printf("%d Last block's index is %d\n", __LINE__,info->last_block_index);
     BF_Block_SetDirty(block0);
     void* nd = BF_Block_GetData(block0); //I hope this updates the hp metadata
-    info = nd; //I do that in order to not mess with memcpy I hope it works 
+    info = nd; //I do that in order to not mess with memcpy multiple times inside the same call itself
   }
   else{
     CALL_BF(BF_GetBlock(hp_info->file_desc,info->last_block_index,block));

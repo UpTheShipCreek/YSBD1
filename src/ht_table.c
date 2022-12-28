@@ -81,7 +81,7 @@ HT_info* HT_OpenFile(char *fileName){
     CALL_OR_DIE(BF_UnpinBlock(block));
     BF_Block_Destroy(&block);
   }
-  memcpy(data,&ht_info,sizeof(HT_info));
+  memcpy(d,&ht_info,sizeof(HT_info));
   CALL_OR_DIE(BF_UnpinBlock(block0));
   BF_Block_Destroy(&block0);
   return &ht_info;
