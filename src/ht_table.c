@@ -154,7 +154,7 @@ int HT_InsertEntry(HT_info* ht_info, Record record){
     //the bucket now must try and fill the new block 
     ht_info->hashtable[bucket] = new_block_id-1;  //we subtract one because the block's id is one less than the number of blocks             
     ht_info->num_o_blocks++; //increment the number of blocks
-    printf("%d New:%d Prev:%d \n", __LINE__,new_block_id,new_block_info->previous_block);
+    //printf("%d New:%d Prev:%d \n", __LINE__,new_block_id,new_block_info->previous_block);
     BF_Block_SetDirty(new_block);
     CALL_OR_DIE(BF_UnpinBlock(new_block));
     BF_Block_Destroy(&new_block);
