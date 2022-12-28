@@ -21,7 +21,7 @@ typedef struct {
 typedef struct {
     // Να το συμπληρώσετε
     int num_o_duplets;
-    int overflow_block;
+    int previous_block;
     int bucket;
 } SHT_block_info;
 
@@ -78,5 +78,10 @@ int SHT_SecondaryGetAllEntries(
     SHT_info* header_info, /* επικεφαλίδα του αρχείου δευτερεύοντος ευρετηρίου*/
     char* name /* το όνομα στο οποίο γίνεται αναζήτηση */);
 
+//get the primary entry block using the secondary table
+int SHT_GetMainBlock(SHT_info* sht_info, char* name, int sblock_id);
+
+//Check if a specific name is in a specific block. If yes print it and return true else return false 
+bool SHT_GetRecordinBlock(HT_info* ht_info, char* name, int block_id);
 
 #endif // SHT_FILE_H
