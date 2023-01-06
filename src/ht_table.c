@@ -90,7 +90,7 @@ HT_info* HT_OpenFile(char *fileName){
 
 int HT_CloseFile( HT_info* ht_info ){
   CALL_OR_DIE(BF_CloseFile(ht_info->file_desc));
-  //free(ht_info); 
+  free(ht_info); 
   return 0;
 }
 
