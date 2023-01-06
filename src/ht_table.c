@@ -58,13 +58,13 @@ HT_info* HT_OpenFile(char *fileName){
   CALL_OR_DIE(BF_GetBlock(file_desc,0,block0));
 
   void* d = BF_Block_GetData(block0);
-  //HT_info* ht_info = malloc(sizeof(HT_info)); //looks like there is a problem with malloc, it doesn't know how much memory to allocate for the hashtable 
-  static HT_info ht_info;
-  memcpy(&ht_info,d,sizeof(HT_info));
+  HT_info* p_info = d;
+  HT_info* ht_info = malloc(sizeof(HT_info)+(p_info->numBuckets*sizeof(int))); //allocating memory size of struct plus the size of our hashtable
+  memcpy(ht_info,d,sizeof(HT_info));
 
-  int block_info_margin = ht_info.max_records*sizeof(Record);
+  int block_info_margin = ht_info->max_records*sizeof(Record);
 
-  for(i = 0; i < ht_info.numBuckets; i++){
+  for(i = 0; i < ht_info->numBuckets; i++){
     BF_Block* block;
     BF_Block_Init(&block);
     CALL_OR_DIE(BF_AllocateBlock(file_desc, block));
@@ -75,16 +75,16 @@ HT_info* HT_OpenFile(char *fileName){
     block_info->num_o_records = 0;
     block_info->bucket = i;
     block_info->previous_block = 0; //we'll treat zero as the block not having overflowed
-    ht_info.hashtable[i] = i+1; // we add one since we can't have any bucket match with block0, this block is for our metadata only
+    ht_info->hashtable[i] = i+1; // we add one since we can't have any bucket match with block0, this block is for our metadata only
 
     BF_Block_SetDirty(block);
     CALL_OR_DIE(BF_UnpinBlock(block));
     BF_Block_Destroy(&block);
   }
-  memcpy(d,&ht_info,sizeof(HT_info));
+  memcpy(d,ht_info,sizeof(HT_info));
   CALL_OR_DIE(BF_UnpinBlock(block0));
   BF_Block_Destroy(&block0);
-  return &ht_info;
+  return ht_info;
 }
 
 
