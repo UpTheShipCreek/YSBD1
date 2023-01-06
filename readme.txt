@@ -15,14 +15,13 @@ HEAP FILE:
     records, which would cause problems, contrary to underestimating. 
 
     Open: I allocate a bit of memory that carries our metadata, so we are always able to reach the file_descriptor mainly. 
-    The memory gets freed with on the close function. I tried using just a pointer to the structure inside block0 but 
-    I encountered some troubles (in the other structures mainly, ht and sht), so this looked like the cleanest solution.
+    The memory gets freed with on the close function.
 
     Close: Frees the external hp_info structure as well as closing the file
 
     InsertEntry: Here I use a pointer to the hp_info structure for all the elements of the structure that need to change and updated mid-call, so 
     as to not call memcpy again and again. For the elements that remain unchanged I still use the external hp_info structure that I malloced. Although
-    it is a bit of a waste of space, the only thing I essentially needed for the external structure in the file descriptor.
+    it is a bit of a waste of space, the only thing I essentially needed the external structure for was the file descriptor.
     I also define again and again the block info margin, which basically points at the end of the space reserved for records and at the start of the space 
     reserved for the metadata. I define it again at the start of the GetAllEntries.
     The insertion itself works as described in the lectures. We check the last block for space, if there isn't any or if the last block is also block0 
@@ -40,17 +39,15 @@ HASH FILE:
     Create: Again allocates the first block to the file and initializes the variables. 
     Most important thing now is that we need to initialize the hashtable, so that it has an actual size
 
-    Open: This one was the reason I decided to allocate external memory to my information structures, cause 
-    returning just a pointer to the allocated block0 space just didn't work. Maybe I'll fix this though if I have time.
-    For the time being I decided make the ht_info structure a static variable, so as to not play with how much 
-    memory I would need to allocate for malloc, since malloc can't know the size of the hashtable and I would need to 
-    manually add it when calling malloc (something I ended up doing in the end for sht). The values of the hashtable are 
-    also initialized, with bucket i matching with block i+1, so as to avoid matching any bucket with block 0
+    Open: Again I allocate a bit of memory for the external structure holding our metadata. 
+    This time I need to allocate space for the hashtable also, so I call a pointer to the metadata structure first
+    in order to reach that information. The values of the hashtable are also initialized with bucket i matching with block i+1, 
+    so as to avoid matching any bucket with block 0.
 
     InsertEntry: On this I use exclusevely the external strucure for all the "calculations" since we only need to update it once. 
     In the end I just memcpy all the updated data from the external structure to the structure of block0 and then dirty it up.
     Of course now the insertion is a bit more sophisticated, the records are inserted according to the bucket that is assigned to 
-    them by the hash function. Of course every bucket is matched to a certain block but if that block fills up, a new one is allocated,
+    them by the hash function. Every bucket is matched to a certain block but if that block fills up, a new one is allocated,
     which keeps the index of the overflowed one and the bucket points to the new one instead, so that any new records go directly to fill
     the new one.
 
