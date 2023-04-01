@@ -1,6 +1,3 @@
-Panagiotopoulos_Georgios_1115201700113
-
-
 HEAP FILE:
     HP_info: It keeps the file descriptor of course but also the index of the last block as well as the
     maximum records that can be stored in a heap block. Since in this data structure we fill block after 
